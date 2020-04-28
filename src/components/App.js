@@ -9,6 +9,7 @@ import HeaderComponent from './todo/HeaderComponent';
 import FooterComponent from './todo/FooterComponent';
 import LogoutComponent from './todo/LogoutComponent';
 import AuthenticatedRoute from './todo/AuthenticatedRoute'
+import UserComponent from './todo/UserComponent';
 
 class App extends Component{
   render() {
@@ -21,7 +22,7 @@ class App extends Component{
                         <Route path="/" exact component={LoginComponent}/>
                         <Route path="/login" component={LoginComponent}/>
                         <AuthenticatedRoute path="/welcome/:name" component={WelcomeComponent}/>
-                        {/* <AuthenticatedRoute path="/todos/:id" component={TodoComponent}/> */}
+                        <AuthenticatedRoute path="/users/:id" component={UserComponent}/> 
                         <AuthenticatedRoute path="/todos" component={ListTodosComponent}/>
                         <AuthenticatedRoute path="/logout" component={LogoutComponent}/>
                         
@@ -30,8 +31,7 @@ class App extends Component{
                     <FooterComponent/>
                 </>
             </Router>
-            {/*<LoginComponent/>
-            <WelcomeComponent/>*/}
+            
         </div>
     )
 }

@@ -1,14 +1,28 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import WelcomeService from "../../api/WelcomeService";
 
 class WelcomeComponent extends Component {
     constructor(props) {
         super(props)
         this.retrivewelcomeMessage = this.retrivewelcomeMessage.bind(this)
+        this.state = {
+            welcome: ""
+        }
     }
+
     retrivewelcomeMessage() {
-        console.log('retrive clicke');
+        //    WelcomeService.executeHelloWorldService().then(response=>{
+        //        this.setState({welcome:response.data})
+        //    })
+        WelcomeService.executeHelloWorldPathVariableService(this.props.match.params.name)
+        .then(response => this.handleSuccessfulResponse(response))
+        .catch(error => this.handleError(error))
     }
+    handleSuccessfulResponse(response) {
+        this.setState({ welcome: response.data})
+    }
+
     render() {
         return (
             <>
@@ -20,8 +34,9 @@ class WelcomeComponent extends Component {
                     Click here to get a customized welcome message.
           <button className="btn btn-primary" onClick={this.retrivewelcomeMessage}>Get</button>
                 </div>
+                {this.state.welcome}
             </>
-        )
+        );
     }
 }
 

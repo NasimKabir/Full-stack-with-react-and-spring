@@ -1,48 +1,80 @@
-import React,{ Component } from "react";
+import React, { Component } from "react";
+import TodoService from "../../api/TodoService";
 
-class ListTodosComponent extends Component{
-    constructor(props){
-        super(props)
-        this.state={
-            todos:
-                [
-                    {id:1,description:'Learn React',done:false,targetDate:new Date()},
-                    {id:2,description:'Learn Java',done:false,targetDate:new Date()},
-                    {id:3,description:'Learn Spring Boot',done:false,targetDate:new Date()},
-                    {id:4,description:'Learn Jpa',done:false,targetDate:new Date()},
-                    {id:5,description:'Learn Mysql',done:false,targetDate:new Date()}
-                ]
-        }
+class ListTodosComponent extends Component {
+    state = {
+        message:null,
+        users: []
     }
-    render(){
-        return(
-              <div className="container">
-                    <h1>List Todos</h1>
-                    <table className="table table-lg">
-                        <thead>
-                            <tr>
-                                <th>Id</th>
-                                <th>Description</th>
-                                <th>Done</th>
-                                <th>TargetDate</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            
-                                {
-                                    this.state.todos.map(todo =>
-                                                        <tr key={todo.id}>
-                                                            <td>{todo.id}</td>
-                                                            <td>{todo.description}</td>
-                                                            <td>{todo.done.toString()}</td>
-                                                            <td>{todo.targetDate.toString()}</td>
-                                                        </tr>
-                                                       )
-                                }
 
-                        </tbody>
-                    </table>
-              </div>
+    componentDidMount() {
+       this.refreshUser()
+    }
+
+    refreshUser(){
+        TodoService.retriveAllUsers().then((response) => {
+            this.setState({
+                users: response.data
+            })
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
+
+    updateUser(id) {
+        console.log(id)
+        this.props.history.push(`/users/${id}`)
+        
+    }
+
+    deleteUser(id) {
+        //console.log(id)
+        TodoService.deleteUsers(id)
+                    .then(response=>{
+                        this.setState({message:`Delete of user ${id}`})
+                        this.refreshUser()
+                    })
+                    .catch(error=>{
+                        console.log(error)
+                    })
+    }
+
+
+
+    render() {
+        return (
+            <div className="container">
+
+                <h1>List Todos</h1>
+                {this.message && <div className="alert alert-success">{this.message}</div>}
+                <table className="table table-lg">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Name</th>
+                            <th>TargetDate</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        {
+                            this.state.users.map(user =>
+                                <tr key={user.id}>
+                                    <td>{user.id}</td>
+                                    <td>{user.name}</td>
+                                    <td>{user.date}</td>
+                                    <td><button onClick={()=>this.updateUser(user.id)} className="btn btn-primary">Update</button>
+                                        <button onClick={()=>this.deleteUser(user.id)} className="btn btn-warning">Delete</button></td>
+                                </tr>
+                            )
+                        }
+
+                    </tbody>
+                </table>
+            </div>
         )
     }
 }
