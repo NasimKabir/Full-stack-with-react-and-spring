@@ -28,7 +28,7 @@ class WelcomeComponent extends Component {
             <>
                 <div className="container">
                     <h1>Welcome </h1>
-            Welcome {this.props.match.params.name} . Manage your todos <Link to="/todos">Click here</Link>
+            Welcome {this.props.match.params.name} . Manage your todos <Link to="/users">Click here</Link>
                 </div>
                 <div className="container">
                     Click here to get a customized welcome message.
