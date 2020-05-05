@@ -7,7 +7,8 @@ class WelcomeComponent extends Component {
         super(props)
         this.retrivewelcomeMessage = this.retrivewelcomeMessage.bind(this)
         this.state = {
-            welcome: ""
+            welcome: "",
+            errorMessage: ""
         }
     }
 
@@ -16,11 +17,21 @@ class WelcomeComponent extends Component {
         //        this.setState({welcome:response.data})
         //    })
         WelcomeService.executeHelloWorldPathVariableService(this.props.match.params.name)
-        .then(response => this.handleSuccessfulResponse(response))
-        .catch(error => this.handleError(error))
+            .then(response => this.handleSuccessfulResponse(response))
+            .catch(error => this.handleError(error))
     }
     handleSuccessfulResponse(response) {
-        this.setState({ welcome: response.data})
+        this.setState({ welcome: response.data })
+    }
+    handleError(error) {
+        console.log(error.response)
+        let errorMessage = '';
+        if (error.message)
+            errorMessage += error.message
+        if (error.response && error.response.data) {
+            errorMessage += error.response.data.message
+        }
+        this.setState({ welcome: errorMessage })
     }
 
     render() {
@@ -29,6 +40,7 @@ class WelcomeComponent extends Component {
                 <div className="container">
                     <h1>Welcome </h1>
             Welcome {this.props.match.params.name} . Manage your todos <Link to="/users">Click here</Link>
+                    
                 </div>
                 <div className="container">
                     Click here to get a customized welcome message.

@@ -9,12 +9,12 @@ class TodoService {
     return axios.get(`http://localhost:8080/users/${id}`)
   }
 
-  updateUser(id,user) {
-    return axios.put(`http://localhost:8080/users/${id}`,user)
+  updateUser(id, user) {
+    return axios.put(`http://localhost:8080/users/${id}`, user)
   }
 
-  addUser(id,user) {
-    return axios.post(`http://localhost:8080/users/`,user)
+  addUser(id, user) {
+    return axios.post(`http://localhost:8080/users/`, user)
   }
 
 
