@@ -16,7 +16,7 @@ class AuthenticationService {
         //  let basicAuthHeader = 'Basic ' + window.btoa(username + ":" + password)
         //  console.log("Register login successful");
         sessionStorage.setItem('authnticatedUser', username);
-        this.setUpAxiosInterceptors(this.basicAuthenticationService(username, password))
+        this.setUpAxiosInterceptors(this.createBasicAuthToken(username, password))
     }
 
 
