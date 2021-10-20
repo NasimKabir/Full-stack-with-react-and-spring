@@ -1,25 +1,29 @@
 import axios from 'axios';
-
+const API_URL="http://localhost:8080/api/v1/todos"
 class TodoService {
-  retriveAllUsers() {
-    return axios.get('http://localhost:8080/users')
-  }
+  retrieveAllTodos() {
+    //console.log('executed service')
+    return axios.get(`${API_URL}`);
+}
 
-  findbyUsers(id) {
-    return axios.get(`http://localhost:8080/users/${id}`)
-  }
+retrieveTodo( id) {
+    //console.log('executed service')
+    return axios.get(`${API_URL}/${id}`);
+}
 
-  updateUser(id, user) {
-    return axios.put(`http://localhost:8080/users/${id}`, user)
-  }
+deleteTodo( id) {
+    //console.log('executed service')
+    return axios.delete(`${API_URL}/${id}`);
+}
 
-  addUser(id, user) {
-    return axios.post(`http://localhost:8080/users/`, user)
-  }
+updateTodo( id, todo) {
+    //console.log('executed service')
+    return axios.put(`${API_URL}/${id}`, todo);
+}
 
-
-  deleteUsers(id) {
-    return axios.delete(`http://localhost:8080/users/${id}`)
-  }
+createTodo( todo) {
+    //console.log('executed service')
+    return axios.post(`${API_URL}`, todo);
+}
 }
 export default new TodoService();

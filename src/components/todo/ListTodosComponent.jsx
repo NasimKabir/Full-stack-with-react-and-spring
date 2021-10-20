@@ -1,95 +1,119 @@
 import React, { Component } from "react";
 import TodoService from "../../api/TodoService";
+import AuthenticationService from './AuthenticationService.js'
 import moment from 'moment';
 
 class ListTodosComponent extends Component {
-    constructor(props){
+    constructor(props) {
+        console.log('constructor')
         super(props)
         this.state = {
-            message: null,
-            users: []
+            todos: [],
+            message: null
         }
-        this.updateUser=this.updateUser.bind(this)
-        this.addnewUser=this.addnewUser.bind(this)
-        this.deleteUser=this.deleteUser.bind(this)
+        this.deleteTodoClicked = this.deleteTodoClicked.bind(this)
+        this.updateTodoClicked = this.updateTodoClicked.bind(this)
+        this.addTodoClicked = this.addTodoClicked.bind(this)
+        this.refreshTodos = this.refreshTodos.bind(this)
+    }
+
+    componentWillUnmount() {
+        console.log('componentWillUnmount')
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        console.log('shouldComponentUpdate')
+        console.log(nextProps)
+        console.log(nextState)
+        return true
     }
 
     componentDidMount() {
-        this.refreshUser()
+        console.log('componentDidMount')
+        this.refreshTodos();
+        console.log(this.state)
     }
 
-    refreshUser() {
-        TodoService.retriveAllUsers().then((response) => {
-            this.setState({
-                users: response.data
-            })
-        })
-            .catch((error) => {
-                console.log(error)
-            })
+    refreshTodos() {
+        let username = AuthenticationService.getLoggedInUserName()
+        TodoService.retrieveAllTodos(username)
+            .then(
+                response => {
+                    console.log( response.data);
+                    this.setState({ todos: response.data })
+                }
+            )
     }
 
-    addnewUser(){
-        this.props.history.push(`/users/-1`)
+    deleteTodoClicked(id) {
+        let username = AuthenticationService.getLoggedInUserName()
+        //console.log(id + " " + username);
+        TodoService.deleteTodo(username, id)
+            .then(
+                response => {
+                    this.setState({ message: `Delete of todo ${id} Successful` })
+                    this.refreshTodos()
+                }
+            )
+
     }
 
-    updateUser(id) {
-        console.log(id)
-        this.props.history.push(`/users/${id}`)
-
+    addTodoClicked() {
+        this.props.history.push(`/todos/-1`)
     }
 
-    deleteUser(id) {
-        //console.log(id)
-        TodoService.deleteUsers(id)
-            .then(response => {
-                this.setState({ message: `Delete of user ${id}` })
-                this.refreshUser()
-            })
-            .catch(error => {
-                console.log(error)
-            })
+    updateTodoClicked(id) {
+        console.log('update ' + id)
+        this.props.history.push(`/todos/${id}`)
+        // /todos/${id}
+        // let username = AuthenticationService.getLoggedInUserName()
+        // //console.log(id + " " + username);
+        // TodoDataService.deleteTodo(username, id)
+        //  .then (
+        //      response => {
+        //         this.setState({message : `Delete of todo ${id} Successful`})
+        //         this.refreshTodos()
+        //      }
+        //  )
+
     }
-
-
 
     render() {
+        console.log('render')
         return (
-            <div className="container">
-
+            <div>
                 <h1>List Todos</h1>
-                <div>
-                    <button className="btn btn-primary" onClick={this.addnewUser}>Add New user</button>
+                {this.state.message && <div class="alert alert-success">{this.state.message}</div>}
+                <div className="container">
+                    <table className="table">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Target Date</th>
+                                <th>IsCompleted?</th>
+                                <th>Update</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                this.state.todos.map(
+                                    todo =>
+                                        <tr key={todo.id}>
+                                            <td>{todo.description}</td>
+                                            <td>{moment(todo.targetDate).format('YYYY-MM-DD')}</td>
+                                            <td>{todo.done.toString()}</td>
+                                            <td><button className="btn btn-success" onClick={() => this.updateTodoClicked(todo.id)}>Update</button></td>
+                                            <td><button className="btn btn-warning" onClick={() => this.deleteTodoClicked(todo.id)}>Delete</button></td>
+                                        </tr>
+                                )
+                            }
+                        </tbody>
+                    </table>
+                    <div className="row">
+                        <button className="btn btn-success" onClick={this.addTodoClicked}>Add</button>
+                    </div>
                 </div>
-
-                <br></br>
-
-                {this.message && <div className="alert alert-success">{this.message}</div>}
-                <table className="table table-lg">
-                    <thead>
-                        <tr>
-                            <th>Id</th>
-                            <th>Name</th>
-                            <th>TargetDate</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                        {
-                            this.state.users.map(user =>
-                                <tr key={user.id}>
-                                    <td>{user.id}</td>
-                                    <td>{user.name}</td>
-                                    <td>{moment(user.date).format('YYYY-MM-DD')}</td>
-                                    <td><button onClick={() => this.updateUser(user.id)} className="btn btn-primary">Update</button>
-                                        <button onClick={() => this.deleteUser(user.id)} className="btn btn-warning">Delete</button></td>
-                                </tr>
-                            )
-                        }
-
-                    </tbody>
-                </table>
             </div>
         )
     }

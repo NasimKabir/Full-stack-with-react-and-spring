@@ -1,42 +1,58 @@
 import axios from 'axios'
+export const USER_NAME_SESSION_ATTRIBUTE_NAME = 'authenticatedUser';
+export const API_URL = 'http://localhost:8080/api/v1';
 class AuthenticationService {
 
-
-    basicAuthenticationService(username, password) {
-        return axios.get('http://localhost:8080/hello',
-         { headers: { authorization: this.createBasicAuthToken(username, password) } })
+    executeJwtAuthenticationService(username, password) {
+        return axios.post(`${API_URL}/login`, {
+            username,
+            password
+        })
     }
 
-    createBasicAuthToken(username, password) {
-        return 'Basic ' + window.btoa(username + ":" + password)
+    registerSuccessfulLogin(username, password) {
+        //let basicAuthHeader = 'Basic ' +  window.btoa(username + ":" + password)
+        //console.log('registerSuccessfulLogin')
+        sessionStorage.setItem(USER_NAME_SESSION_ATTRIBUTE_NAME, username)
+        this.setupAxiosInterceptors(this.createBasicAuthToken(username, password))
     }
 
+    registerSuccessfulLoginForJwt(username, token) {
+        sessionStorage.setItem(USER_NAME_SESSION_ATTRIBUTE_NAME, username)
+        this.setupAxiosInterceptors(this.createJWTToken(token))
+    }
 
-    registerSuccesfulLogin(username, password) {
-        //  let basicAuthHeader = 'Basic ' + window.btoa(username + ":" + password)
-        //  console.log("Register login successful");
-        sessionStorage.setItem('authnticatedUser', username);
-        this.setUpAxiosInterceptors(this.createBasicAuthToken(username, password))
+    createJWTToken(token) {
+        return 'Bearer ' + token
     }
 
 
     logout() {
-        sessionStorage.removeItem('authnticatedUser');
+        sessionStorage.removeItem(USER_NAME_SESSION_ATTRIBUTE_NAME);
     }
 
     isUserLoggedIn() {
-        let user = sessionStorage.getItem('authnticatedUser');
+        let user = sessionStorage.getItem(USER_NAME_SESSION_ATTRIBUTE_NAME)
         if (user === null) return false
         return true
     }
 
-    setUpAxiosInterceptors(basicAuthHeader) {
-        axios.interceptors.request.use((config) => {
-            if (this.isUserLoggedIn()) {
-                config.headers.authorization = basicAuthHeader
+    getLoggedInUserName() {
+        let user = sessionStorage.getItem(USER_NAME_SESSION_ATTRIBUTE_NAME)
+        if (user === null) return ''
+        return user
+    }
+
+    setupAxiosInterceptors(token) {
+
+        axios.interceptors.request.use(
+            (config) => {
+                if (this.isUserLoggedIn()) {
+                    config.headers.authorization = token
+                }
+                return config
             }
-            return config
-        })
+        )
     }
 }
 export default new AuthenticationService()
